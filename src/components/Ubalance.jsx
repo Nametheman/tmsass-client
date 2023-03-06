@@ -44,6 +44,7 @@ const Container = styled.div`
     font-size: 27px;
     font-weight: bold;
     margin-top: 10px;
+    user-select: none;
     /* letter-spacing: 0.2pt; */
   }
 `;
