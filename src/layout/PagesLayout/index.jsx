@@ -16,4 +16,6 @@ export default index;
 
 const Container = styled.main`
   display: flex;
+  justify-content: space-between;
+  position: relative;
 `;

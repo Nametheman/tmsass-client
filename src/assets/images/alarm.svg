@@ -1,0 +1,24 @@
+<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="20" cy="20" r="20" fill="#F5F5F5"/>
+<path d="M13.5479 16.3662C13.5479 12.6201 16.4366 9.58325 20 9.58325C23.5634 9.58325 26.4521 12.6201 26.4521 16.3662V19.3009C26.4521 20.5207 26.9613 21.687 27.8608 22.5275C28.8491 23.4511 28.184 25.0871 26.8201 25.0871H13.18C11.8161 25.0871 11.1509 23.4511 12.1393 22.5275C13.0387 21.687 13.5479 20.5207 13.5479 19.3009V16.3662Z" fill="#868FA0"/>
+<path d="M19.9998 30.4168C21.7492 30.4168 23.1674 29.0843 23.1674 27.4406C23.1674 27.4127 23.1669 27.3849 23.1661 27.3572C23.1591 27.1172 22.9375 26.9426 22.682 26.9399L17.3303 26.8828C17.0748 26.8801 16.849 27.0499 16.8363 27.2898C16.8336 27.3397 16.8323 27.39 16.8323 27.4406C16.8323 29.0843 18.2504 30.4168 19.9998 30.4168Z" fill="#868FA0"/>
+<g filter="url(#filter0_dd_534_6695)">
+<ellipse cx="27.2917" cy="11.6667" rx="4.16667" ry="4.16667" fill="#E01919"/>
+</g>
+<defs>
+<filter id="filter0_dd_534_6695" x="20.625" y="5" width="13.3333" height="14.5833" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feMorphology radius="2.5" operator="dilate" in="SourceAlpha" result="effect1_dropShadow_534_6695"/>
+<feOffset/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.968627 0 0 0 0 0.975163 0 0 0 0 0.988235 0 0 0 1 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_534_6695"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="1.25"/>
+<feGaussianBlur stdDeviation="1.25"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"/>
+<feBlend mode="normal" in2="effect1_dropShadow_534_6695" result="effect2_dropShadow_534_6695"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect2_dropShadow_534_6695" result="shape"/>
+</filter>
+</defs>
+</svg>

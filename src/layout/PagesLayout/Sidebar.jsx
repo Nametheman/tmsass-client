@@ -12,8 +12,9 @@ import { ReactComponent as marketplaceImg } from "../../assets/icons/marketplace
 const Sidebar = () => {
   const location = useLocation();
   const myPath = location.pathname;
+  const currPath = JSON.parse(sessionStorage.getItem("currPath"));
   const [clikedLink, setClickedLink] = useState("");
-  console.log(location.pathname, clikedLink);
+  console.log(currPath, clikedLink);
   const sideBarLinks = [
     { name: "Dashboard", logo: dashboardImg, path: "/dashboard", id: "link1" },
     {
@@ -60,8 +61,9 @@ const Sidebar = () => {
               key={link.id}
               onClick={() => {
                 setClickedLink(link.path);
+                sessionStorage.setItem("currPath", JSON.stringify(link.path));
               }}
-              className={`${myPath === clikedLink ? "active" : ""}`}
+              // className={`${currPath !== clikedLink ? "active" : ""}`}
             >
               <link.logo className="nav-svg" />
               {link.name}
@@ -76,7 +78,9 @@ const Sidebar = () => {
 export default Sidebar;
 const Container = styled.div`
   width: 250px;
+  min-height: 100vh;
   height: 100vh;
+  position: fixed;
   /* padding: 15px 0; */
   background-color: #fff;
 
@@ -95,6 +99,8 @@ const Container = styled.div`
   }
 
   .linksSection {
+    padding: 0 20px;
+    margin-top: 50px;
   }
 `;
 
@@ -103,7 +109,7 @@ const SideLink = styled(NavLink)`
   /* width: 270px; */
   margin: 0 auto;
   align-items: center;
-  padding: 14px 0 14px 28px;
+  padding: 14px 15px;
   gap: 10px;
   margin-bottom: 20px;
   transition: all 0.2s ease-in-out;
@@ -119,17 +125,24 @@ const SideLink = styled(NavLink)`
     border: 1px solid;
     color: #fff;
     border-radius: 8px;
+    .nav-svg {
+      fill: #fff;
+      stroke: #fff;
+      stroke-width: 0.1px;
+    }
   }
 
-  /* .active {
+  &.active {
     border: 1px solid;
     color: #fff;
     border-radius: 8px;
     background-color: #28d1ff;
     .nav-svg {
-      filter: #fff;
+      fill: #fff;
+      stroke: #fff;
+      stroke-width: 0.1px;
     }
-  } */
+  }
 
   /* &:hover,
   &:focus,
