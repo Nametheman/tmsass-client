@@ -71,6 +71,9 @@ const Sidebar = () => {
           );
         })}
       </div>
+      <div>
+        <p>Logout</p>
+      </div>
     </Container>
   );
 };

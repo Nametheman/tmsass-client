@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { AiFillEyeInvisible, AiFillEye } from "react-icons/ai";
+import { BsEye, BsEyeSlash } from "react-icons/bs";
 
 const Ubalance = () => {
   const [showBalance, setShowBalance] = useState(false);
@@ -13,7 +14,7 @@ const Ubalance = () => {
             setShowBalance(!showBalance);
           }}
         >
-          {showBalance ? <AiFillEye /> : <AiFillEyeInvisible />}
+          {showBalance ? <BsEye /> : <BsEyeSlash />}
         </div>
       </div>
       <p className="u_balance">#{showBalance ? "9,000,000" : "*********"}</p>

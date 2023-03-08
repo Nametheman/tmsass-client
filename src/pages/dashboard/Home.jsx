@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import alarmSvg from "../../assets/images/alarm.svg";
 import userAvi from "../../assets/images/dummyAvi.svg";
@@ -9,6 +9,29 @@ import Totaltxnvalue from "../../components/TotalTxnValue";
 import Totalcommission from "../../components/Totalcomm";
 
 const Home = () => {
+  const [mydata, setMyData] = useState();
+  const token = JSON.parse(sessionStorage.getItem("token"));
+  useEffect(() => {
+    getDashboard();
+  }, [token]);
+  const getDashboard = async () => {
+    try {
+      const response = await fetch(
+        `http://89.38.135.41:4457/v1/client/:clientId`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const data = await response.json();
+      setMyData(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
     <Container>
       <div className="head">
@@ -129,6 +152,7 @@ const Container = styled.div`
       display: flex;
       gap: 12px;
       margin-top: 10px;
+      flex-wrap: wrap;
     }
 
     .recentCustomers {

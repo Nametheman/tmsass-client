@@ -5,6 +5,9 @@ import userAvi from "../../assets/images/dummyAvi.svg";
 import { RxCaretDown } from "react-icons/rx";
 import balanceCard from "../../assets/images/card.svg";
 import { AiFillEyeInvisible, AiFillEye } from "react-icons/ai";
+// import fundBtn from "../../assets/images/fundBtn.svg";
+import { BsEye, BsEyeSlash } from "react-icons/bs";
+
 import fundBtn from "../../assets/images/fundBtn.svg";
 import fundHoverBtn from "../../assets/images/fundHover.svg";
 import historyBtn from "../../assets/images/historyBtn.svg";
@@ -81,7 +84,7 @@ const Home = () => {
                     setShowBalance(!showBalance);
                   }}
                 >
-                  {showBalance ? <AiFillEye /> : <AiFillEyeInvisible />}
+                  {showBalance ? <BsEye /> : <BsEyeSlash />}
                 </div>{" "}
               </div>
               <p className="balance">
