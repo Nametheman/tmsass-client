@@ -1,0 +1,45 @@
+table {
+  text-align: left;
+  border-collapse: collapse;
+  width: 100%;
+  border-radius: 5px;
+}
+
+.th {
+  padding: 15px 8px;
+  font-size: 0.63rem;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  color: #000;
+  background: #28d1ff66;
+  text-transform: capitalize;
+  text-align: center;
+}
+
+.tbody {
+  font-size: 0.65rem;
+}
+
+.recentReview button {
+  background-color: #0e814a;
+  color: aliceblue;
+  border: none;
+  outline: none;
+  font-size: 11px;
+  padding: 4px 12px;
+  cursor: pointer;
+  border-radius: 3px;
+}
+
+tr a {
+  text-decoration: none;
+  color: #fff;
+  padding: 3px 10px;
+  font-size: 12px;
+  border-radius: 3px;
+  background: #0e814a;
+}
+
+tbody tr td {
+  padding: 15px 8px;
+}

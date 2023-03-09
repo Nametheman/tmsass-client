@@ -21,6 +21,7 @@ const Home = () => {
   const ActionWrapper = styled.div`
     display: flex;
     align-items: center;
+    justify-content: center;
     padding: 0 40px;
     margin-top: 40px;
     gap: 30px;
@@ -41,7 +42,7 @@ const Home = () => {
     .historyContainer {
       cursor: pointer;
       img {
-        width: 335px;
+        width: 250px;
       }
       .historyBtn {
         display: ${historyHover ? "none" : ""};
@@ -204,6 +205,9 @@ const Container = styled.section`
     }
 
     .content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       padding: 0 40px;
       margin-top: 40px;
 

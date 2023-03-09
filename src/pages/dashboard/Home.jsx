@@ -7,17 +7,41 @@ import Ubalance from "../../components/Ubalance";
 import TotalTxnCount from "../../components/TotalTxnCount";
 import Totaltxnvalue from "../../components/TotalTxnValue";
 import Totalcommission from "../../components/Totalcomm";
+import ReusableTable from "../../reusables/ReusableTable";
 
 const Home = () => {
   const [mydata, setMyData] = useState();
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [recentTxnData, setRecentTxnData] = useState();
+  const [init, setInit] = useState(1);
+
   const token = JSON.parse(sessionStorage.getItem("token"));
+  const clientId = JSON.parse(sessionStorage.getItem("clientId"));
   useEffect(() => {
     getDashboard();
   }, [token]);
+  useEffect(() => {
+    getRecentTransactions();
+  }, [clientId]);
+
+  //Table column goes in here. This is to be passed as props/////////////////////////////
+  const columns = [
+    { field: "no", header: "S/N" },
+    { field: "txnID", header: "TRANSACTION ID" },
+    { field: "serviceName", header: "SERVICE NAME" },
+    { field: "billerName", header: "BILLER NAME" },
+    { field: "amount", header: "AMOUNT" },
+    { field: "netVal", header: "NET VALUE" },
+    { field: "commission", header: "COMMISSION" },
+    { field: "date", header: "DATE" },
+    { field: "status", header: "STATUS" },
+  ];
+  //APIs section starts here ////////////////////////////////////////////////////////////
   const getDashboard = async () => {
     try {
       const response = await fetch(
-        `http://89.38.135.41:4457/v1/client/:clientId`,
+        `http://89.38.135.41:4457/v1/client/${clientId}`,
         {
           method: "GET",
           headers: {
@@ -27,11 +51,34 @@ const Home = () => {
         }
       );
       const data = await response.json();
+      console.log(data);
       setMyData(data);
     } catch (error) {
       console.log(error);
     }
   };
+
+  const getRecentTransactions = async () => {
+    try {
+      const response = await fetch(
+        `http://89.38.135.41:4457/v1/transactions/billing/${clientId}?page=${page}&startDate=2022-09-13&endDate=2022-12-01&limit=${limit}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const data = await response.json();
+      console.log(data);
+      setRecentTxnData(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  //APIs section ends here ////////////////////////////////////////////////////////////
+
   return (
     <Container>
       <div className="head">
@@ -64,7 +111,7 @@ const Home = () => {
 
         <div className="accountInfoWrapper">
           <Card>
-            <Ubalance />
+            <Ubalance balance={mydata?.data?.wallet?.balance} />
           </Card>
           <Card>
             <TotalTxnCount />
@@ -78,6 +125,15 @@ const Home = () => {
         </div>
 
         <p className="recentCustomers">Recent Transactions</p>
+
+        <TableWrapper>
+          <ReusableTable
+            type="recent"
+            data={recentTxnData?.data}
+            columns={columns}
+            init={init}
+          />
+        </TableWrapper>
       </div>
     </Container>
   );
@@ -124,11 +180,12 @@ const Container = styled.div`
 
   .contentWrapper {
     background-color: #fff;
-    padding: 20px;
+    padding: 20px 0 80px;
     border-radius: 20px;
     margin-top: 50px;
 
     .firstContentHead {
+      padding: 20px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -153,11 +210,13 @@ const Container = styled.div`
       gap: 12px;
       margin-top: 10px;
       flex-wrap: wrap;
+      padding: 20px;
     }
 
     .recentCustomers {
       margin-top: 40px;
       font-size: 30px;
+      padding: 20px;
     }
   }
 `;
@@ -171,4 +230,8 @@ const Card = styled.div`
   padding: 10px 15px;
   border-radius: 10px;
   min-height: 150px;
+`;
+
+const TableWrapper = styled.div`
+  /* margin: 20px 0; */
 `;

@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { AiFillEyeInvisible, AiFillEye } from "react-icons/ai";
 import { BsEye, BsEyeSlash } from "react-icons/bs";
 
-const Ubalance = () => {
+const Ubalance = ({ balance }) => {
   const [showBalance, setShowBalance] = useState(false);
   return (
     <Container>
@@ -17,7 +17,9 @@ const Ubalance = () => {
           {showBalance ? <BsEye /> : <BsEyeSlash />}
         </div>
       </div>
-      <p className="u_balance">#{showBalance ? "9,000,000" : "*********"}</p>
+      <p className="u_balance">
+        #{showBalance ? `${balance.toLocaleString()}` : "*********"}
+      </p>
     </Container>
   );
 };
