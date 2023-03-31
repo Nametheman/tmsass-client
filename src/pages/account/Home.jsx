@@ -283,8 +283,8 @@ const Container = styled.section`
   padding: 30px;
   position: absolute;
   top: 0;
-  width: calc(100% - 250px);
-  max-width: calc(100% - 250px);
+  width: calc(100% - 16%);
+  max-width: calc(100% - 16%);
 
   .head {
     display: flex;

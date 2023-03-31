@@ -111,7 +111,7 @@ const Sidebar = () => {
 
 export default Sidebar;
 const Container = styled.div`
-  width: 250px;
+  width: 16%;
   /* max-height: 900px; */
   position: fixed;
   z-index: 10;
