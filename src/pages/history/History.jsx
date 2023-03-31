@@ -2,19 +2,22 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import alarmSvg from "../../assets/images/alarm.svg";
 import userAvi from "../../assets/images/dummyAvi.svg";
+import cloud from "../../assets/icons/cloud.svg";
 import { RxCaretDown } from "react-icons/rx";
 import ReusableTable from "../../reusables/ReusableTable";
-import { useNavigate } from "react-router-dom";
+import Filter from "./Filter";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import calendar from "../../assets/icons/calendar.svg";
 import filter from "../../assets/icons/filter.svg";
 import search from "../../assets/icons/search.svg";
-import cloud from "../../assets/icons/cloud.svg";
+import moment from "moment";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 
-const Home = () => {
+// imort dateFilter
+
+const History = () => {
   const [init, setInit] = useState(1);
   const [page, setPage] = useState(1);
   const [txnData, setTxnData] = useState();
@@ -27,17 +30,15 @@ const Home = () => {
   const indexOfFirstPost = indexOfLastPost - postsPerPage;
   const [endNumber, setEndNumber] = useState(indexOfLastPost);
   const [startCount, setStartCount] = useState(currentPage);
-  const [endCount, setEndCount] = useState(10);
+  const [endCount, setEndCount] = useState(currentPage * 10);
   const [startPoint, setStartPoint] = useState(0);
   const [endPoint, setEndPoint] = useState(5);
   const [isLastPage, setIsLastPage] = useState(false);
   const [startDate, setStartDate] = useState(new Date("2020-03-16T14:30:00"));
   const [endDate, setEndDate] = useState(new Date());
   const [loading, setLoading] = useState(false);
-  const [endPage, setEndPage] = useState();
-  const [dataLength, setDataLength] = useState();
 
-  const navigate = useNavigate();
+  let num = 1;
 
   const clientId = JSON.parse(sessionStorage.getItem("clientId"));
   const token = JSON.parse(sessionStorage.getItem("token"));
@@ -46,11 +47,9 @@ const Home = () => {
   const columns = [
     { field: "no", header: "S/N" },
     { field: "txnID", header: "TRANSACTION ID" },
-    { field: "serviceName", header: "SERVICE NAME" },
-    { field: "billerName", header: "BILLER NAME" },
+    // { field: "action", header: "ACTION" },
+    // { field: "account", header: "ACCOUNT" },
     { field: "amount", header: "AMOUNT" },
-    { field: "commission", header: "COMMISSION" },
-    { field: "netVal", header: "NET VALUE" },
     { field: "date", header: "DATE" },
     { field: "status", header: "STATUS" },
   ];
@@ -60,7 +59,7 @@ const Home = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        `${process.env.REACT_APP_BASE_URL}transactions/billing/?page=${currentPage}&startDate=${startDate}&endDate=${endDate}&limit=${postsPerPage}`,
+        `http://89.38.135.41:4457/v1/transactions/${clientId}?page=${currentPage}&startDate=${startDate}&endDate=${endDate}&limit=${postsPerPage}`,
         {
           method: "GET",
           headers: {
@@ -73,22 +72,20 @@ const Home = () => {
       console.log(data);
       setTxnData(data);
       setLoading(false);
-      setDataLength(data?.total);
-      setEndPage(data?.pages);
     } catch (error) {
-      setLoading(false);
       console.log(error);
+      setLoading(false);
     }
   };
   //APIs section ends here ////////////////////////////////////////////////////////////
 
   useEffect(() => {
-    getTransactions();
-  }, [clientId, currentPage, startDate, endDate, postsPerPage]);
-
+    console.log(moment(startDate).format(), moment(endDate).format());
+  }, []);
   let myData = txnData?.data;
+  const dataLength = txnData?.total;
 
-  // const endPage = Math.ceil(dataLength / postsPerPage);
+  const endPage = Math.ceil(dataLength / postsPerPage);
 
   const pageNumbers = [];
   for (let i = 1; i <= Math.ceil(dataLength / postsPerPage); i++) {
@@ -96,41 +93,62 @@ const Home = () => {
   }
   const myPageNumbers = pageNumbers.slice(startPoint, endPoint);
 
-  const prevPageHandler = async () => {
+  const prevPageHandler = () => {
     if (currentPage === 1) {
       return;
     } else {
       setCurrentPage(currentPage - 1);
-      setStartCount(startCount - Number(postsPerPage));
-      setEndCount(endCount - limit);
-      setInit(init - Number(limit));
     }
+    if (currentPage <= startPoint + 1) {
+      setStartPoint(startPoint - 5);
+      setEndPoint(endPoint - 5);
+    }
+    setStartCount(startCount - 10);
+    setEndCount(endCount - 10);
+    setInit(init - 10);
   };
-
-  const nextPageHandler = async () => {
+  const nextPageHandler = () => {
     if (currentPage >= endPage) {
       setIsLastPage(true);
-      setEndCount(dataLength);
       return;
     } else {
       setCurrentPage(currentPage + 1);
-      setStartCount(startCount + Number(postsPerPage));
-      setEndCount(startCount + limit + limit - 1);
-      setInit(init + Number(limit));
     }
+    if (currentPage >= endPoint) {
+      setStartPoint(startPoint + 5);
+      setEndPoint(endPoint + 5);
+    }
+
+    setStartCount(startCount + 10);
+    setEndCount(endCount + myData?.length);
+    setInit(init + 10);
+    num = num + 1;
   };
+
+  useEffect(() => {
+    if (txnData && dataLength < postsPerPage) {
+      setEndCount(dataLength);
+    }
+
+    if (endPage > currentPage) {
+      setEndCount(currentPage * 10);
+    }
+  }, [currentPage]);
+
+  useEffect(() => {
+    getTransactions();
+    if (txnData && dataLength < postsPerPage) {
+      setEndCount(dataLength);
+    }
+  }, [clientId, currentPage, dataLength, startDate, endDate]);
 
   return (
     <Container>
+      {" "}
       <div className="head">
         <div className="head_content">
           <img src={alarmSvg} alt="" />
-          <div
-            className="userProfileWrapper"
-            onClick={() => {
-              navigate("/dashboard/profile-settings");
-            }}
-          >
+          <div className="userProfileWrapper">
             <img src={userAvi} alt="" />
             <div className="userInfo">
               <p style={{ fontWeight: "bold" }}>CIT MFB</p>
@@ -142,7 +160,7 @@ const Home = () => {
       </div>
       <div className="contentWrapper">
         <div className="table-head">
-          <p className="recentCustomers">Transactions</p>
+          <p className="recentCustomers">Deposit History</p>
           <div className="filterSection">
             <FilterContainer>
               <DatePickers>
@@ -167,16 +185,13 @@ const Home = () => {
                   <img src={calendar} alt="" />
                 </Range>
               </DatePickers>
-              {/*    <Range style={{ width: "90px" }}>
+              {/*  <Range style={{ width: "90px" }}>
                 <img src={filter} alt="" />
 
                 <select name="filter" id="filter">
-                  <option value="">Success</option>
-                  <option value="">Failed</option>
                   <option value="">All</option>
-                  <option vakue="">Today</option>
-                  <option value="">Last Week</option>
-                  <option value="">Last Month</option>
+                  <option value="">All</option>
+                  <option value="">All</option>
                 </select>
               </Range> */}
               <SearchWrapper>
@@ -189,16 +204,16 @@ const Home = () => {
               <img src={cloud} alt="" /> Download
             </button>
           </div>
-        </div>{" "}
+        </div>
         {loading ? (
-          <div style={{ padding: "0 50px" }}>
-            <Skeleton height={500} style={{ marginTop: "30px" }} />
+          <div style={{ padding: "0 30px" }}>
+            <Skeleton height={500} />
           </div>
         ) : (
           <>
             <TableWrapper>
               <ReusableTable
-                type="transactions"
+                type="deposit-history"
                 columns={columns}
                 init={init}
                 data={txnData?.data}
@@ -208,58 +223,24 @@ const Home = () => {
               <h5>
                 Showing {startCount} to {endCount} of {dataLength} Entries
               </h5>
-
-              <div className="xPagination">
-                <div className="perPage">
-                  <p>Per page:</p>
-                  <select
-                    name="perPage"
-                    id="perPage"
-                    onChange={(e) => {
-                      if (currentPage === 1) {
-                        setPostsPerOage(e.target.value);
-                        setEndCount(e.target.value);
-                        setLimit(Number(e.target.value));
-                      } else {
-                        setCurrentPage(1);
-                        setInit(1);
-                        setStartCount(1);
-                        setLimit(Number(e.target.value));
-                        setPostsPerOage(e.target.value);
-                        setEndCount(e.target.value);
-                      }
-                    }}
-                    value={limit}
-                  >
-                    {[10, 20, 50].map((opt, idx) => {
-                      return (
-                        <option value={opt} key={idx}>
-                          {opt}
-                        </option>
-                      );
-                    })}
-                  </select>
-                </div>
-
-                <PaginationBtnWrapper>
-                  <button onClick={prevPageHandler}>Previous</button>
-                  {myPageNumbers.map((number) => (
-                    <div key={number} className="numbers">
-                      <p
-                        href="#"
-                        style={{
-                          background: currentPage === number ? "#28D1FF" : "",
-                          color: currentPage === number ? "#fff" : "",
-                        }}
-                        key={number}
-                      >
-                        {number}
-                      </p>
-                    </div>
-                  ))}
-                  <button onClick={nextPageHandler}>Next</button>
-                </PaginationBtnWrapper>
-              </div>
+              <PaginationBtnWrapper>
+                <button onClick={prevPageHandler}>Previous</button>
+                {myPageNumbers.map((number) => (
+                  <div key={number} className="numbers">
+                    <p
+                      href="#"
+                      style={{
+                        background: currentPage === number ? "#28D1FF" : "",
+                        color: currentPage === number ? "#fff" : "",
+                      }}
+                      key={number}
+                    >
+                      {number}
+                    </p>
+                  </div>
+                ))}
+                <button onClick={nextPageHandler}>Next</button>
+              </PaginationBtnWrapper>
             </PaginationWrapper>
           </>
         )}
@@ -268,7 +249,7 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default History;
 
 const Container = styled.div`
   padding: 30px;
@@ -276,7 +257,6 @@ const Container = styled.div`
   top: 0;
   width: calc(100% - 250px);
   max-width: calc(100% - 250px);
-
   .head {
     display: flex;
     align-items: center;
@@ -289,6 +269,9 @@ const Container = styled.div`
       align-items: center;
       padding: 0 10px;
 
+      img {
+        width: 35px;
+      }
       .userProfileWrapper {
         width: 200px;
         border-left: 1px solid #eeebeb;
@@ -313,6 +296,36 @@ const Container = styled.div`
     padding: 10px 0 80px;
     border-radius: 20px;
     margin-top: 50px;
+
+    .firstContentHead {
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      .pageName {
+        font-size: 30px;
+      }
+      .filterWrapper {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+
+        select {
+          border: 1px solid #00000047;
+          border-radius: 5px;
+          padding: 5px;
+        }
+      }
+    }
+
+    .accountInfoWrapper {
+      display: flex;
+      gap: 12px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+      padding: 20px;
+    }
+
     .table-head {
       display: flex;
       align-items: center;
@@ -354,41 +367,6 @@ const Container = styled.div`
         }
       }
     }
-
-    .firstContentHead {
-      padding: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      .pageName {
-        font-size: 30px;
-      }
-      .filterWrapper {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-
-        select {
-          border: 1px solid #00000047;
-          border-radius: 5px;
-          padding: 5px;
-        }
-      }
-    }
-
-    .accountInfoWrapper {
-      display: flex;
-      gap: 12px;
-      margin-top: 10px;
-      flex-wrap: wrap;
-      padding: 20px;
-    }
-
-    .recentCustomers {
-      /* margin-top: 20px; */
-      font-size: 30px;
-      padding: 20px;
-    }
   }
 `;
 const TableWrapper = styled.div`
@@ -398,38 +376,10 @@ export const PaginationWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 20px;
+  margin-top: 40px;
   padding: 0 20px;
   h5 {
     font-weight: 500;
-  }
-
-  .xPagination {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-
-    .perPage {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-
-      p {
-        font-size: 13px;
-      }
-
-      select {
-        height: 30px;
-        padding: 0 10px;
-        cursor: pointer;
-        border-radius: 8px;
-        border: 1px solid #d2d2d2;
-        color: #4d4c4c;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-      }
-    }
   }
 `;
 export const PaginationBtnWrapper = styled.div`
@@ -468,7 +418,6 @@ export const PaginationBtnWrapper = styled.div`
     }
   }
 `;
-
 const FilterContainer = styled.div`
   display: flex;
   align-items: center;

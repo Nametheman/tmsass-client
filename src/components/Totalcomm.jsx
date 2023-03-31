@@ -5,14 +5,14 @@ import totaltxnvalImg from "../assets/images/totaltxnval.svg";
 import totalcommImg from "../assets/images/totcomm.svg";
 import arrIncrease from "../assets/icons/arrIncrease.svg";
 
-const Totalcommission = () => {
+const Totalcommission = ({ txnComm }) => {
   return (
     <Container>
       <div className="u_head">
         <p>Total Commission</p>
         <img src={totaltxnvalImg} alt="" />
       </div>
-      <p className="u_balance">#750,000</p>
+      <p className="u_balance">₦{txnComm?.toLocaleString()}</p>
       <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
         <img src={arrIncrease} alt="" style={{ marginTop: "19px" }} />
         <p className="change_rate">

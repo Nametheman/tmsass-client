@@ -18,7 +18,7 @@ const Ubalance = ({ balance }) => {
         </div>
       </div>
       <p className="u_balance">
-        #{showBalance ? `${balance.toLocaleString()}` : "*********"}
+        ₦{showBalance ? `${balance.toLocaleString()}` : "*********"}
       </p>
     </Container>
   );

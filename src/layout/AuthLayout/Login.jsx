@@ -3,7 +3,9 @@ import styled from "styled-components";
 import loginImg from "../../assets/images/login.svg";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
+import { useSessionStorage } from "../../hooks/useSessionStorage";
 import "react-toastify/dist/ReactToastify.css";
+import ForgotPassword from "./ForgotPassword";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -15,8 +17,11 @@ const Login = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [formIsValid1, setFormIsValid1] = useState(false);
   const [formIsValid2, setFormIsValid2] = useState(false);
+  const [showForgotPass, setShowForgotPass] = useState(false);
   // const
   const errors = {};
+
+  const { setSessionStorage } = useSessionStorage("token");
 
   const handleEmail = (e) => {
     setEnteredEmail(e.target.value);
@@ -52,16 +57,19 @@ const Login = () => {
   const AuthUser = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`http://89.38.135.41:4457/v1/auths/login`, {
-        method: "POST",
-        body: JSON.stringify({
-          email: enteredEmail,
-          password: enteredPassword,
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_BASE_URL}auths/login`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            email: enteredEmail,
+            password: enteredPassword,
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
       const data = await response.json();
       console.log(data);
       setLoading(false);
@@ -73,8 +81,17 @@ const Login = () => {
         sessionStorage.setItem("token", JSON.stringify(data?.data?.token));
         sessionStorage.setItem(
           "clientId",
-          JSON.stringify(data?.data?.client?.clientId)
+          JSON.stringify(data?.data?.client?.userId)
         );
+        sessionStorage.setItem(
+          "email",
+          JSON.stringify(data?.data?.client?.email)
+        );
+        sessionStorage.setItem(
+          "name",
+          JSON.stringify(data?.data?.client?.name)
+        );
+        // setSessionStorage(data?.data?.token);
         navigate("/dashboard");
       } else {
         setErrorMessage(data?.error);
@@ -159,7 +176,14 @@ const Login = () => {
                   Sign Up
                 </span>
               </p>
-              <p style={{ cursor: "pointer" }}>Forgot Password ?</p>
+              <p
+                style={{ cursor: "pointer", color: "#28d1ff" }}
+                onClick={() => {
+                  setShowForgotPass(true);
+                }}
+              >
+                Forgot Password ?
+              </p>
             </div>
 
             <LoginBtn
@@ -180,6 +204,9 @@ const Login = () => {
         pauseOnHover
         theme="light"
       />
+      {showForgotPass && (
+        <ForgotPassword setShowForgotPass={setShowForgotPass} />
+      )}
     </Container>
   );
 };
@@ -191,6 +218,7 @@ const Container = styled.div`
   flex-wrap: nowrap;
   width: 100%;
   height: 100vh;
+  max-height: 1024px;
   overflow-y: hidden;
   .left-pane {
     flex: 1;
@@ -220,7 +248,7 @@ const Container = styled.div`
       margin-top: 40px;
 
       p {
-        color: #28d1ff;
+        color: #000;
         font-size: 16px;
         font-weight: 500;
       }

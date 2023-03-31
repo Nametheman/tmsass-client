@@ -17,5 +17,8 @@ export default index;
 const Container = styled.main`
   display: flex;
   justify-content: space-between;
-  position: relative;
+  /* position: relative; */
+  width: 100%;
+  /* max-width: 1440px; */
+  margin: 0 auto;
 `;

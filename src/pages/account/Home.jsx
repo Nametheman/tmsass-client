@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import alarmSvg from "../../assets/images/alarm.svg";
 import userAvi from "../../assets/images/dummyAvi.svg";
@@ -12,11 +12,118 @@ import fundBtn from "../../assets/images/fundBtn.svg";
 import fundHoverBtn from "../../assets/images/fundHover.svg";
 import historyBtn from "../../assets/images/historyBtn.svg";
 import historyHoverBtn from "../../assets/images/historyHover.svg";
+import { Routes, Route, Link, useNavigate } from "react-router-dom";
+import History from "../history/History";
+import FundModal from "./FundModal";
+import { toast } from "react-hot-toast";
+import { Rings } from "react-loader-spinner";
+// import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Home = () => {
   const [showBalance, setShowBalance] = useState(false);
   const [fundHover, setFundHover] = useState(false);
   const [historyHover, setHistoryHover] = useState(false);
+  const [showFundModal, setShowFundModal] = useState(false);
+  const [balance, setBalance] = useState();
+  const [isVerifying, setIsVerifying] = useState(false);
+
+  const navigate = useNavigate();
+
+  const token = JSON.parse(sessionStorage.getItem("token"));
+  const clientId = JSON.parse(sessionStorage.getItem("clientId"));
+  const clientId2 = JSON.parse(sessionStorage.getItem("clientId2"));
+  useEffect(() => {
+    getDashboard();
+  }, [token]);
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const trxref = urlParams.get("trxref");
+  // const location = window.location.href;
+  // console.log(window.location.href);
+
+  console.log(trxref);
+  useEffect(() => {
+    if (trxref) {
+      // verifyFund();
+      toast.promise(verifyFund(), {
+        pending: "Loading",
+        success: "Account Funded Successfully",
+        error: "Something went wrong! Please Refresh Page",
+      });
+    }
+    // const myPromise = verifyFund();
+
+    // toast.promise(myPromise, {
+    //   loading: "Loading",
+    //   success: "Got the data",
+    //   error: "Error when fetching",
+    // });
+  }, [trxref]);
+
+  const getDashboard = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_BASE_URL}client/${clientId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const data = await response.json();
+      console.log(data);
+      setBalance(data?.data?.wallet?.balance);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // const config = {
+  //   headers: {
+  //     "Content-Type": "application/json",
+  //     Authorization: `Bearer ${token}`,
+  //   },
+  // };
+
+  // const verifyFund2 = async () => {
+  //   await axios
+  //     .post(
+  //       `${process.env.REACT_APP_BASE_URL}/client/fund/${clientId2}/verify`,
+  //       { transactionId: trxref },
+  //       config
+  //     )
+  //     .then((response) => {
+  //       console.log(response);
+  //     });
+  // };
+  const verifyFund = async () => {
+    try {
+      setIsVerifying(true);
+      const response = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/client/fund/${clientId2}/verify`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ transactionId: trxref }),
+        }
+      );
+      const data = await response.json();
+      setIsVerifying(false);
+      if (data.message === "Success") {
+        navigate("/account");
+      }
+      console.log(data);
+    } catch (error) {
+      console.log(error);
+      setIsVerifying(false);
+    }
+  };
 
   const ActionWrapper = styled.div`
     display: flex;
@@ -58,7 +165,12 @@ const Home = () => {
       <div className="head">
         <div className="head_content">
           <img src={alarmSvg} alt="" />
-          <div className="userProfileWrapper">
+          <div
+            className="userProfileWrapper"
+            onClick={() => {
+              navigate("/dashboard/profile-settings");
+            }}
+          >
             <img src={userAvi} alt="" />
             <div className="userInfo">
               <p style={{ fontWeight: "bold" }}>CIT MFB</p>
@@ -89,7 +201,7 @@ const Home = () => {
                 </div>{" "}
               </div>
               <p className="balance">
-                #{showBalance ? "3,000,000" : "*********"}
+                ₦{showBalance ? balance?.toLocaleString() : "*********"}
               </p>{" "}
             </div>
           </div>
@@ -104,6 +216,9 @@ const Home = () => {
             onMouseLeave={() => {
               setFundHover(false);
             }}
+            onClick={() => {
+              setShowFundModal(true);
+            }}
           >
             <span className="fundBtn">
               <img src={fundBtn} alt="" />
@@ -112,24 +227,52 @@ const Home = () => {
               <img src={fundHoverBtn} alt="" />
             </span>
           </div>
-          <div
-            className="historyContainer"
-            onMouseOver={() => {
-              setHistoryHover(true);
-            }}
-            onMouseLeave={() => {
-              setHistoryHover(false);
-            }}
-          >
-            <span className="historyBtn">
-              <img src={historyBtn} alt="" />
-            </span>
-            <span className="historyHover">
-              <img src={historyHoverBtn} alt="" />
-            </span>
-          </div>
+
+          <Link to="/account/deposit-history">
+            <div
+              className="historyContainer"
+              onMouseOver={() => {
+                setHistoryHover(true);
+              }}
+              onMouseLeave={() => {
+                setHistoryHover(false);
+              }}
+            >
+              <span className="historyBtn">
+                <img src={historyBtn} alt="" />
+              </span>
+              <span className="historyHover">
+                <img src={historyHoverBtn} alt="" />
+              </span>
+            </div>
+          </Link>
         </ActionWrapper>
       </div>
+      {showFundModal && <FundModal setShowFundModal={setShowFundModal} />}
+      {isVerifying && (
+        <Rings
+          height="80"
+          width="80"
+          color="#28d1ff"
+          radius="6"
+          elementStyle={{
+            position: "absolute",
+            bottom: "0",
+          }}
+          wrapperStyle={{
+            position: "fixed",
+            top: "0",
+            left: "0",
+            right: "0",
+            bottom: "0",
+            "background-color": "rgba(0, 0, 0, 0.371)",
+            "z-index": "1000",
+          }}
+          wrapperClass="loadingEl"
+          visible={true}
+          ariaLabel="rings-loading"
+        />
+      )}
     </Container>
   );
 };
@@ -140,8 +283,8 @@ const Container = styled.section`
   padding: 30px;
   position: absolute;
   top: 0;
-
-  width: 100%;
+  width: calc(100% - 250px);
+  max-width: calc(100% - 250px);
 
   .head {
     display: flex;

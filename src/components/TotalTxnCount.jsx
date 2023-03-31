@@ -5,14 +5,14 @@ import totaltxnvalImg from "../assets/images/totaltxnval.svg";
 import totalcommImg from "../assets/images/totcomm.svg";
 import arrIncrease from "../assets/icons/arrIncrease.svg";
 
-const TotalTxnCount = () => {
+const TotalTxnCount = ({ txnCount }) => {
   return (
     <Container>
       <div className="u_head">
         <p>Total Transaction Count</p>
         <img src={totaltxnImg} alt="" />
       </div>
-      <p className="u_balance">450</p>
+      <p className="u_balance">{txnCount}</p>
       <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
         <img src={arrIncrease} alt="" style={{ marginTop: "19px" }} />
         <p className="change_rate">
